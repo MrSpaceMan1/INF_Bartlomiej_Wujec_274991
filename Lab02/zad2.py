@@ -1,10 +1,7 @@
 import pygad
 import numpy
 
-nazwy = ["zegar", "obraz-pejaż", "obraz-portert", "radio", "laptop", "lamka nocna", "srebrne szrućce",
-         "porcelana", "figura z brązu", "skórzana torbka", "odkurzacz"]
-ceny = [100, 300, 200, 40, 500, 70, 100, 250, 300, 280, 300]
-wagi = [7, 7, 6, 2, 5, 6, 1, 3, 10, 3, 15]
+S = [1, 2, 3, 6, 10, 17, 25, 29, 30, 41, 51, 60, 70, 79, 80]
 
 #definiujemy parametry chromosomu
 #geny to liczby: 0 lub 1
@@ -12,12 +9,11 @@ gene_space = [0, 1]
 
 #definiujemy funkcję fitness
 def fitness_func(solution, solution_idx):
-    sum_wagi = numpy.sum(wagi * solution)
-    sum_ceny = numpy.sum(ceny * solution)
-    if sum_wagi > 25:
-        fitness = 0
-    else:
-        fitness = sum_ceny
+    sum1 = numpy.sum(solution * S)
+    solution_invert = 1 - solution
+    sum2 = numpy.sum(solution_invert * S)
+    fitness = -numpy.abs(sum1-sum2)
+    #lub: fitness = 1.0 / (1.0 + numpy.abs(sum1-sum2))
     return fitness
 
 fitness_function = fitness_func
@@ -25,7 +21,7 @@ fitness_function = fitness_func
 #ile chromsomów w populacji
 #ile genow ma chromosom
 sol_per_pop = 10
-num_genes = len(ceny)
+num_genes = len(S)
 
 #ile wylaniamy rodzicow do "rozmanazania" (okolo 50% populacji)
 #ile pokolen
@@ -44,7 +40,7 @@ crossover_type = "single_point"
 #mutacja ma dzialac na ilu procent genow?
 #trzeba pamietac ile genow ma chromosom
 mutation_type = "random"
-mutation_percent_genes = 10
+mutation_percent_genes = 8
 
 #inicjacja algorytmu z powyzszymi parametrami wpisanymi w atrybuty
 ga_instance = pygad.GA(gene_space=gene_space,
@@ -68,16 +64,8 @@ print("Parameters of the best solution : {solution}".format(solution=solution))
 print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
 
 #tutaj dodatkowo wyswietlamy sume wskazana przez jedynki
-prediction = numpy.sum(ceny * solution)
+prediction = numpy.sum(S*solution)
 print("Predicted output based on the best solution : {prediction}".format(prediction=prediction))
-items = []
-for i in range(0, len(solution)):
-    if solution[i] == 1.0:
-        items.append(nazwy[i])
-print("These items would be put in to backpack")
-print(items)
 
-print("This would be the weight")
-print(numpy.sum(wagi * solution))
 #wyswietlenie wykresu: jak zmieniala sie ocena na przestrzeni pokolen
 ga_instance.plot_fitness()
