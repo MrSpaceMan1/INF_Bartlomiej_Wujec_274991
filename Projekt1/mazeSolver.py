@@ -41,28 +41,28 @@ def walls_intact(_maze: list):
     maze = _maze
     maze_side = int(math.sqrt(len(maze)))
     walls = 0
-
+    intact = True
     for i in range(0, maze_side):
         if maze[i] != 1:
-            return False, walls-4
+            intact = False
         else:
             walls+=1
-    for i in range(0, len(maze), maze_side):
+    for i in range(maze_side, len(maze)-maze_side-1, maze_side):
         if maze[i] != 1:
-            return False, walls-4
+            intact = False
         else:
             walls+=1
-    for i in range(maze_side-1, len(maze)+1, maze_side):
+    for i in range(maze_side*2-1, len(maze)-maze_side-1, maze_side):
         if maze[i] != 1:
-            return False, walls-4
+            intact = False
         else:
             walls+=1
     for i in range(maze_side*maze_side-maze_side-1, len(maze)):
         if maze[i] != 1:
-            return False, walls-4
+            intact = False
         else:
             walls+=1
-    return True, walls-4
+    return intact, walls
 
 
 def in_bounds(index, maze_side):
