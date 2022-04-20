@@ -18,22 +18,17 @@ def maze_solver(_maze: list):
         curr_node = index_to_pos(to_visit.get_nowait())
         visited.append(pos_to_index(*curr_node))
         maze[pos_to_index(*curr_node)] = 2
-        try:
-            for i in (-1, 1):
+        for i in (-1, 1):
+            if in_bounds(pos_to_index(curr_node[0]+i, curr_node[1]), maze_side):
                 if maze[pos_to_index(curr_node[0]+i, curr_node[1])] == 0:
                     if pos_to_index(curr_node[0]+i, curr_node[1]) not in visited:
                         to_visit.put_nowait(pos_to_index(curr_node[0]+i, curr_node[1]))
+            if in_bounds(pos_to_index(curr_node[0], curr_node[1]+i), maze_side):
                 if maze[pos_to_index(curr_node[0], curr_node[1]+i)] == 0:
                     if pos_to_index(curr_node[0], curr_node[1]+i) not in visited:
                         to_visit.put_nowait(pos_to_index(curr_node[0], curr_node[1]+i))
-        except IndexError as e:
-            print(curr_node)
-            print(visited)
-            print(to_visit)
-            print("MAJOR FUCK UP, FIX THIS SHIT")
-            return False
-        if curr_node == (maze_side-2, maze_side-2):
-            break
+            if curr_node == (maze_side-2, maze_side-2):
+                break
     return pos_to_index(*(maze_side-2, maze_side-2)) in visited
 
 
