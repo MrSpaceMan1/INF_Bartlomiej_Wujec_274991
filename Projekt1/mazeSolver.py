@@ -11,25 +11,27 @@ def maze_solver(_maze: list):
 
     maze = _maze
     maze_side = int(math.sqrt(len(maze)))
+
+    start = 0
+    end = len(maze)-1
+
     to_visit = queue.SimpleQueue()
     visited = list()
-    to_visit.put_nowait(pos_to_index(1, 1))
+
+    to_visit.put_nowait(start)
     while to_visit.qsize() != 0:
-        curr_node = index_to_pos(to_visit.get_nowait())
-        visited.append(pos_to_index(*curr_node))
-        maze[pos_to_index(*curr_node)] = 2
-        for i in (-1, 1):
-            if in_bounds(pos_to_index(curr_node[0]+i, curr_node[1]), maze_side):
-                if maze[pos_to_index(curr_node[0]+i, curr_node[1])] == 0:
-                    if pos_to_index(curr_node[0]+i, curr_node[1]) not in visited:
-                        to_visit.put_nowait(pos_to_index(curr_node[0]+i, curr_node[1]))
-            if in_bounds(pos_to_index(curr_node[0], curr_node[1]+i), maze_side):
-                if maze[pos_to_index(curr_node[0], curr_node[1]+i)] == 0:
-                    if pos_to_index(curr_node[0], curr_node[1]+i) not in visited:
-                        to_visit.put_nowait(pos_to_index(curr_node[0], curr_node[1]+i))
-            if curr_node == (maze_side-2, maze_side-2):
-                break
-    return pos_to_index(*(maze_side-2, maze_side-2)) in visited
+        index = to_visit.get_nowait()
+        visited.append(index)
+        if in_bounds(index-1, maze_side):
+            to_visit.put_nowait(index-1)
+        if in_bounds(index+1, maze_side):
+            to_visit.put_nowait(index+1)
+        if in_bounds(index+maze_side, maze_side):
+            to_visit.put_nowait(index+maze_side)
+        if in_bounds(index-maze_side, maze_side):
+            to_visit.put_nowait(index-maze_side)
+
+    return end in visited
 
 
 def walls_intact(_maze: list):
