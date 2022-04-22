@@ -5,6 +5,10 @@ import pygad
 
 maze = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
+cache = {
+
+}
+
 maze_side = 20
 time_sum = 0
 t1 = time.time()
@@ -19,10 +23,16 @@ def on_generation(instance):
     print(f"{instance.generations_completed} | Time elapsed: {int(time_sum//60)}:{math.ceil(time_sum-((time_sum//60)*60))}")
 
 def fitness(solution, solution_idx):
+    global cache
+    if cache[solution.array2string()]:
+        return cache[solution.array2string()]
     score = 0
     if solution[0] == 0 and solution[maze_side**2-1] == 0:
         score+=10
-    if maze_solver(solution):
+
+    solvable, traversed = maze_solver(solution)
+
+    if solvable:
         score+=10
 
     for i in range(0, maze_side**2):
@@ -35,24 +45,25 @@ def fitness(solution, solution_idx):
             if sum_neighbours(i, solution) == 8:
                 score += -1
 
-    for i in range(1, maze_side**2):
-        if solution[i] == 0:
-            if not maze_solver(solution, end=i):
-                score += -1
+    empty_cells = int(maze_side**2 - sum(solution.tolist()))
+    not_accessible = traversed-empty_cells
+    score += not_accessible
+    if not cache[solution.array2string()]:
+        cache[solution.array2string()] = score
     return score
 
 
 gene_space = [0, 1]
 fitness_func = fitness
-sol_per_pop = 20
+sol_per_pop = 100
 num_genes = maze_side**2
-num_parents_mating = 2
+num_parents_mating = 10
 num_generations = 100
-keep_parents = 1
+keep_parents = 5
 parent_selection_type = "sss"
 crossover_type = "single_point"
 mutation_type = "random"
-mutation_percent_genes = math.ceil(num_genes*0.02)
+mutation_percent_genes = math.ceil(num_genes*0.01)
 
 ga_instance = pygad.GA(gene_space=gene_space,
                        num_generations=num_generations,
@@ -66,7 +77,7 @@ ga_instance = pygad.GA(gene_space=gene_space,
                        mutation_type=mutation_type,
                        mutation_percent_genes=mutation_percent_genes,
                        on_generation=on_generation,
-                       stop_criteria=["saturate_30", "reach_20"]
+                       # stop_criteria=["saturate_30"]
                        )
 
 ga_instance.run()

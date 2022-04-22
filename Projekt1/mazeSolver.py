@@ -1,6 +1,17 @@
 import math
 import queue
 
+class Queue:
+    def __init__(self):
+        self.queue = []
+    def put(self, val):
+        self.queue.append(val)
+    def get(self):
+        return_value = self.queue[0]
+        self.queue = self.queue[1:]
+        return return_value
+    def empty(self):
+        return len(self.queue)==0
 
 def maze_solver(_maze: list, start=None, end=None):
     maze = _maze
@@ -11,18 +22,17 @@ def maze_solver(_maze: list, start=None, end=None):
     if end is None:
         end = len(maze)-1
 
-    to_visit = queue.Queue()
-    visited = list()
-
+    to_visit = Queue()
+    visited = set()
     if maze[start] == 1:
-        return False
+        return False, len(visited)
     if maze[end] == 1:
-        return False
+        return False, len(visited)
 
     to_visit.put(start)
     while not to_visit.empty():
         index = to_visit.get()
-        visited.append(index)
+        visited.add(index)
 
         if not in_first_column(index, maze_side):
             if (index-1) not in visited:
@@ -44,7 +54,7 @@ def maze_solver(_maze: list, start=None, end=None):
                 if maze[index-maze_side] == 0:
                     to_visit.put(index-maze_side)
 
-    return end in visited
+    return end in visited, len(visited)
 
 
 def walls_intact(_maze: list):
