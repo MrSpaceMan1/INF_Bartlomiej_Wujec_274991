@@ -6,6 +6,8 @@ class Queue:
         self.queue = []
 
     def put(self, val):
+        if val in self.queue:
+            return
         self.queue.append(val)
 
     def get(self):
