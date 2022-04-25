@@ -1,17 +1,19 @@
 import math
-import queue
+
 
 class Queue:
     def __init__(self):
         self.queue = []
+
     def put(self, val):
         self.queue.append(val)
+
     def get(self):
-        return_value = self.queue[0]
-        self.queue = self.queue[1:]
-        return return_value
+        return self.queue.pop(0)
+
     def empty(self):
-        return len(self.queue)==0
+        return len(self.queue) == 0
+
 
 def maze_solver(_maze: list, start=None, end=None):
     maze = _maze
@@ -55,34 +57,6 @@ def maze_solver(_maze: list, start=None, end=None):
                     to_visit.put(index-maze_side)
 
     return end in visited, len(visited)
-
-
-def walls_intact(_maze: list):
-    maze = _maze
-    maze_side = int(math.sqrt(len(maze)))
-    walls = 0
-    intact = True
-    for i in range(0, maze_side):
-        if maze[i] != 1:
-            intact = False
-        else:
-            walls+=1
-    for i in range(maze_side, len(maze)-maze_side-1, maze_side):
-        if maze[i] != 1:
-            intact = False
-        else:
-            walls+=1
-    for i in range(maze_side*2-1, len(maze)-maze_side-1, maze_side):
-        if maze[i] != 1:
-            intact = False
-        else:
-            walls+=1
-    for i in range(maze_side*maze_side-maze_side-1, len(maze)):
-        if maze[i] != 1:
-            intact = False
-        else:
-            walls+=1
-    return intact, walls
 
 
 def in_bounds(index, maze_side):
@@ -174,6 +148,3 @@ def print_maze(maze: list, sides=True) -> None:
         for i in range(0, maze_side + 1):
             print("⬛", end="")
     print()
-
-
-# maze = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0]

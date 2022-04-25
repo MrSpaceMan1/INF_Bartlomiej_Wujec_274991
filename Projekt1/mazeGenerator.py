@@ -1,39 +1,48 @@
 import math
 import time
-from mazeSolver import maze_solver, walls_intact, sum_neighbours, possible_moves
+from mazeSolver import maze_solver, sum_neighbours, possible_moves
 import pygad
-
+from numpy import array2string
 maze = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-cache = {
+cache_uses = 0
+cache = {}
 
-}
-
-maze_side = 20
+maze_side = 30
 time_sum = 0
 t1 = time.time()
 t2 = None
+
+
 def on_generation(instance):
+    global cache_uses
     global time_sum
     global t1
     global t2
     t2 = time.time()
     time_sum += t2 - t1
     t1 = t2
-    print(f"{instance.generations_completed} | Time elapsed: {int(time_sum//60)}:{math.ceil(time_sum-((time_sum//60)*60))}")
+    print(f"{instance.generations_completed} "
+          f"| Time elapsed: {int(time_sum//60)}:{math.ceil(time_sum-((time_sum//60)*60))} "
+          f"| Generation fitness: {instance.best_solutions_fitness[-1]} ")
+
 
 def fitness(solution, solution_idx):
     global cache
-    if cache[solution.array2string()]:
-        return cache[solution.array2string()]
+    global cache_uses
+
+    if cache.get(array2string(solution)) is not None:
+        cache_uses += 1
+        return cache[array2string(solution)]
+
     score = 0
     if solution[0] == 0 and solution[maze_side**2-1] == 0:
-        score+=10
+        score += (maze_side**2)/2
 
     solvable, traversed = maze_solver(solution)
 
     if solvable:
-        score+=10
+        score += (maze_side**2)/2
 
     for i in range(0, maze_side**2):
         if solution[i] == 0:
@@ -48,8 +57,8 @@ def fitness(solution, solution_idx):
     empty_cells = int(maze_side**2 - sum(solution.tolist()))
     not_accessible = traversed-empty_cells
     score += not_accessible
-    if not cache[solution.array2string()]:
-        cache[solution.array2string()] = score
+    if cache.get(array2string(solution)) is None:
+        cache[array2string(solution)] = score
     return score
 
 
@@ -57,13 +66,13 @@ gene_space = [0, 1]
 fitness_func = fitness
 sol_per_pop = 100
 num_genes = maze_side**2
-num_parents_mating = 10
+num_parents_mating = 20
 num_generations = 100
-keep_parents = 5
+keep_parents = 10
 parent_selection_type = "sss"
 crossover_type = "single_point"
 mutation_type = "random"
-mutation_percent_genes = math.ceil(num_genes*0.01)
+mutation_percent_genes = math.ceil(num_genes*0.05)
 
 ga_instance = pygad.GA(gene_space=gene_space,
                        num_generations=num_generations,
@@ -77,7 +86,7 @@ ga_instance = pygad.GA(gene_space=gene_space,
                        mutation_type=mutation_type,
                        mutation_percent_genes=mutation_percent_genes,
                        on_generation=on_generation,
-                       # stop_criteria=["saturate_30"]
+                       stop_criteria=["saturate_30"]
                        )
 
 ga_instance.run()
@@ -100,5 +109,7 @@ for i in range(0, len(a)):
 for i in range(0, maze_side+1):
     print("⬛", end="")
 print()
+
+print(f"Cache uses: {cache_uses}")
 
 ga_instance.plot_fitness()
