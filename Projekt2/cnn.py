@@ -54,13 +54,13 @@ model = models.Sequential([
 
 model.summary()
 
-# model.compile(optimizer='adam',
-#               loss="categorical_crossentropy",
-#               metrics=['accuracy'])
+model.compile(optimizer='adam',
+              loss="categorical_crossentropy",
+              metrics=['accuracy'])
+
+history = model.fit(train_x, train_y, epochs=5)
 #
-# history = model.fit(train_x, train_y, epochs=5)
-#
-history = LeNet.fit(train_x, train_y, epochs=10)
+# history = LeNet.fit(train_x, train_y, epochs=10)
 
 plt.plot(history.history['accuracy'], label='accuracy')
 plt.xlabel('Epoch')
@@ -70,8 +70,9 @@ plt.legend(loc='lower right')
 
 plt.show()
 
-test_loss, test_acc = LeNet.evaluate(test_x, test_y, verbose=2)
+# test_loss, test_acc = LeNet.evaluate(test_x, test_y, verbose=2)
+test_loss, test_acc = model.evaluate(test_x, test_y, verbose=2)
 print(test_acc)
 
-LeNet.save("models.LeNet")
+# LeNet.save("models.LeNet")
 # model.save("capitalLettersConv")

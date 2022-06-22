@@ -2,12 +2,12 @@ from tensorflow import keras
 import numpy as np
 from image_preprocessing import preprocess
 
-symbols = preprocess("test.jpg", 500, 1500)
+symbols = preprocess("test.png", 0, 63)
 print(symbols.shape)
 
 symbols = np.expand_dims(symbols, axis=3)
 
-model = keras.models.load_model("models.CustomCNN")
+model = keras.models.load_model("models.MLP")
 
 res = model.predict(symbols)
 
